@@ -143,6 +143,10 @@ You can add your self to the video group with: sudo usermod -a -G video we
 #8.3 install maiden
 (see https://github.com/monome/maiden/blob/dev/README.md)
 
+NOTE: unless you are planning to actively change/develop Maiden, it may be better to just download the latest build from the repo.
+https://github.com/monome/maiden/releases
+make sure it ends up in: ~/maiden
+
 wget https://storage.googleapis.com/golang/go1.9.linux-armv6l.tar.gz
 sudo tar -C /usr/local -xzf go1.9.linux-armv6l.tar.gz
 
