@@ -1,175 +1,119 @@
-nornsinstall.txt
+# 1.0 Install Raspbian Stretch Lite
 
+• Download lastest verison of Raspbian Stretch Lite here: <https://www.raspberrypi.org/downloads/raspbian/>  
+• Follow the guide here <https://www.raspberrypi.org/documentation/installation/installing-images/README.md>  
+• Insert SD card and power up your Raspberry Pi  
 
-# 1. Download raspbian stretch lite 
+# 3.0 Setup Norns
 
-# 2. write to sdcard 
-I use, etcher.io
+• Follow the guide here: <https://github.com/monome/norns-image/blob/master/build-dev-image.md>  
+Stop once you get to the kernel section.
 
+## 3.1 Build your own kernel (Optional)
 
-# 3 Boot PI
+Follow these two gudies to configure and build a 4.14 kernel:  
+<https://www.raspberrypi.org/documentation/linux/kernel/building.md>  
+<https://www.raspberrypi.org/documentation/linux/kernel/configuring.md>  
 
-# 4 follow norns setup
-https://github.com/monome/norns-image/blob/master/build-dev-image.md
+### 3.1.1 Configuration
 
-## 4.1 do raspi-config section
+• Run `make menuconfig` from the linux folder
 
+• Change the following options:  
+  1. `Kernel Features—>Timer Frequenecy 1000hz` (Optional)  
+  2. `Kernal Features —> Preemption Model —> Preemptive kernel (low-latency dektop)`  
+  3. `CPU Power Management —> CPU Frequency scaling —> default CPUFreq governor (performance)`  
 
-## 4.2 do user  including sudo
-(I installed all locations, but it took forever, id be tempted to skip this, and just select your own region :)  )
+You may also want to alter /boot/config.txt e.g. if your using touchscreens
 
+• Once installed, reboot the Raspberry Pi
 
-at this stage, I usually change to using ssh to log in remotely we@norns/sleep
-easier to cut n paste things ;) 
+### 3.1.2 Build
 
-## 4.5 updates
-do as instructed :) 
-till you get to the kernel , then stop : )
+• Complete the the rest of the building guide
 
+## 3.2 Configure Norns image
 
-## 4.4 kernel (OPTIONAL!) (UPDATED)
+### 3.2.1 Clone norns-image repo
 
-you cannot use the 'norns' kernel, and actually there is no real need too.
-so you have two choices 
+• Run `git clone https://github.com/monome/norns-image.git`
 
-### 4.4 A - keep the kernel as is, i.e. do nothing
-for most this is the 'preferred' option, I've run with the stock kernel as it was fine.
+### 3.2.2 Remove I2C setup
 
-### 4.4 B build your own kernel
-so norns usually runs with a preemptive kernel, so you can build a similar one if you wish.
-(which is what I did, since I already had a means to do this quickly/easily - and not on the PI which takes a very long time!)
+• Run `nano norns-image/config/norns-init.service`
 
-we use a 4.14 kernel and just change a couple of settings 
-follow instructions on raspbian website, building a kernel, you can either cross compile, or build locally, take ~90min?
+• Change `line:ExecStart=/usr/bin/amixer set Master 255 on` to `ExecStart=/usr/bin/amixer set PCM 255 on` (Depending on your audio interface, you can find out if you need this by using the command `amixer`)
 
-https://www.raspberrypi.org/documentation/linux/kernel/building.md
-https://www.raspberrypi.org/documentation/linux/kernel/configuring.md
+• Comment out the following by placing a `#` at the start of the following lines:  
+  1. `ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x00`  
+  2. `ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x40`
 
-menuconfig :
-to get into the menuconfig run make menuconfig from the linux folder
-Kernel Features—>Timer Frequenecy 1000hz (optional, as suggested by norns dev, but doesnt make much difference to me)
-Full Preemption:
-Kernal Features —> Preemption Model —> Preemptive kernel (low-latency dektop)
-(I think thats what technobear meant by full-preemption - FigrHed)
-CPU Power Management —> CPU Frequency scaling —>
-default CPUFreq governor (performance)
+Press `Ctrl+X` and then `Y` to save changes and exit.
 
-you do NOT need dt-blob.bin (shouldn't hurt though)
+• Run `nano norns-image/scripts/init-norns.sh`  
+• Comment out the `i2cset` lines by placing a `#` at the start of each line• 
 
-you may want to alter /boot/config.txt e.g. if your using touchscreens
+### 3.2.3 Set audio device
 
+• Run `nano norns-image/config/norns-jack.service`  
+• Change `hw:1` to your audio device  
 
-once installed, rebooted, 
-back to the norn-image setup readme 
+Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-#4.5 setup image (DON’T RUN setup.sh YET!)
+### 3.2.4 Disable network overrides (Optional)
 
-(do clone from git clone https://github.com/monome/norns-image.git )
+Complete the following steps to stop Norns overwriting your network settings and configuring the 'norns' access point.  
 
-do not run setup.sh YET
+• Run `nano norns-image/setup.sh`  
+• Comment out the WiFi setcion by placing a `#` at the start of each line:  
 
-norns-image/config/norns-init.service - comment out (put # in front, we dont want any i2cset)
-#ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x00
-#ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x40
+Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-norns-image/config/norns-jack.service - change to your soundcard.
-(-d alsa -d hw:1,0 )
- if you’re using a usb soundcard, you'll probably need to change buffer size to (-p 256 or -p 512) 
+### 3.2.4 Configure Maiden
 
-norns-image/config/norns-maiden.service - change exec to maiden (not maiden.arm) 
-ExecStart=/home/we/maiden/maiden -fd 3 -app ./app/build -data /home/we/dust -doc /home/we/norns/doc
+• Run `nano norns-image/config/norns-maiden.service`  
+• Remove `.arm` from the end of `/home/we/maiden/maiden.arm`  
 
+Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-norns-image/scripts/init-norns.sh 
-comment out i2cset 
+## 3.3 Complete Norns images setup
 
+• Run `./norns-image/setup.sh`
 
+# 4 Install Dust
+• Run `cd ~`  
+• Run `git clone https://github.com/monome/dust`  
 
+# 5 Install Crone, Maitron and Maiden
 
-! now run setup.sh
+• Run `cd ~`  
+• Run `git clone https://github.com/monome/norns`  
 
+• Run`sudo nano /lib/systemd/system/systemd-udevd.service`  
+• Change `MountFlags=slave` to `MountFlags=shared`  
 
+• Run `cd ~/norns`  
+• Run `./waf configure`  
+• Run `./waf`  
 
-#6  install norns
+• Run `pushd sc`  
+• Run `./install.sh`  
+• Run `popd`  
 
-follow instructions for apt-get, accept all defaults
+## 5.1 Install Crone
+• Run `touch ~/.jackdrc`  
+• Run `cat ~/norns-image/config/jackdrc >> ~/.jackdrc`  
 
+## 5.2 Install Matron
+• Run `sudo usermod -a -G video we` to ensure that the user can access the framebuffer
 
-cd ~
-git clone https://github.com/monome/norns (or alternative)
+## 5.3 Install Maiden
+• Download latest .tgz release from <https://github.com/monome/maiden/releases>  
+• Extract it to `~/maiden`  
 
-optional push2 : https://github.com/thetechnobear/norns
-sudo apt-get install libusb-1.0-0-dev 
-wget https://raw.githubusercontent.com/TheTechnobear/MEC/master/resources/79-push2.rules
-sudo mv 79-push2.rules /etc/udev/rules.d/
+# 6 Finish
+Reboot and enjoy
 
+# Troubleshooting
 
-
-sudo vi /lib/systemd/system/systemd-udevd.service  , change MountFlags=slave to MountFlags=shared, as instructed
-
-
-cd norns
-./waf configure
-./waf
-
-! run sclang : 
-sclang
-
-./install.sh
-
-more details at: https://github.com/monome/norns/blob/master/readme-setup.md
-
-#7 install dust
-cd ~
-git clone https://github.com/monome/dust
-
-#8.1 install crone
-Crone handles the sound 
-if this fails change the norns-image/config/jackdrc to match the line we we edited in norns-jack.service then copy it to your home dir
-touch ~/.jackdrc
-cat pathto/norns-image/config/jackdrc >> ~/.jackdrc
-and you may need to change the line: ExecStart=/usr/bin/amixer set Master 255 on
-to: 
-ExecStart=/usr/bin/amixer set PCM 255 on
-(at least i did on mine - FigrHed
-you can find out which command you need by just typing ‘amixer’ and it will show up at the topic the format:
-Simple mixer control ‘IT_HERE’, 0)
-
-#8.2 install Matron
-This should automatically run if you have an HDMI screen plugged in. If it doesn’t, it may be because you do not have access privileges to the framebuffer device.
-You can add your self to the video group with: sudo usermod -a -G video we
-
-
-#8.3 install maiden
-(see https://github.com/monome/maiden/blob/dev/README.md)
-
-NOTE: unless you are planning to actively change/develop Maiden, it may be better to just download the latest build from the repo.
-https://github.com/monome/maiden/releases
-make sure it ends up in: ~/maiden
-
-wget https://storage.googleapis.com/golang/go1.9.linux-armv6l.tar.gz
-sudo tar -C /usr/local -xzf go1.9.linux-armv6l.tar.gz
-
-wget https://github.com/Masterminds/glide/releases/download/v0.13.1/glide-v0.13.1-linux-armv7.tar.gz
-tar xvzf glide-v0.13.1-linux-armv7.tar.gz linux-armv7/glide
-sudo mv linux-armv7/glide /usr/local/go/bin/
-rm -rf linux-armv7 *.tar.gz
-
-
-
-export PATH=$PATH:/usr/local/go/bin (add to .profile too)
-export GOPATH=$HOME/go (add to .profile too)
-
-go get -d github.com/monome/maiden
-cd ~/go/src/github.com/monome/maiden
-glide install
-go build
-
-cd ~
-ln -s ~/go/src/github.com/monome/maiden
-
-
-
-UI, I built on a desktop, much faster
-then copy into ~/maiden/app/build
 
