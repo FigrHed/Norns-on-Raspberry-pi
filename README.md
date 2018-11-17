@@ -19,10 +19,10 @@ Follow these two gudies to configure and build a 4.14 kernel:
 
 • Run `make menuconfig` from the linux folder
 
-• Change the following options:
-•• `Kernel Features—>Timer Frequenecy 1000hz` (Optional)  
-•• `Kernal Features —> Preemption Model —> Preemptive kernel (low-latency dektop)`  
-•• `CPU Power Management —> CPU Frequency scaling —> default CPUFreq governor (performance)`  
+• Change the following options:  
+  1. `Kernel Features—>Timer Frequenecy 1000hz` (Optional)  
+  2. `Kernal Features —> Preemption Model —> Preemptive kernel (low-latency dektop)`  
+  3. `CPU Power Management —> CPU Frequency scaling —> default CPUFreq governor (performance)`  
 
 You may also want to alter /boot/config.txt e.g. if your using touchscreens
 
@@ -44,9 +44,9 @@ You may also want to alter /boot/config.txt e.g. if your using touchscreens
 
 • Change `line:ExecStart=/usr/bin/amixer set Master 255 on` to `ExecStart=/usr/bin/amixer set PCM 255 on` (Depending on your audio interface, you can find out if you need this by using the command `amixer`)
 
-• Comment out the following by placing a `#` at the start of the following lines:
-`ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x00`  
-`ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x40`
+• Comment out the following by placing a `#` at the start of the following lines:  
+  1. `ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x00`  
+  2. `ExecStart=-/usr/sbin/i2cset -y 1 0x28 0x40`
 
 Press `Ctrl+X` and then `Y` to save changes and exit.
 
