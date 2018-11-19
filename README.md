@@ -1,21 +1,21 @@
-# 1.0 Install Raspbian Stretch Lite
+# 1 Install Raspbian Stretch Lite
 
 • Download lastest verison of Raspbian Stretch Lite here: <https://www.raspberrypi.org/downloads/raspbian/>  
 • Follow the guide here <https://www.raspberrypi.org/documentation/installation/installing-images/README.md>  
 • Insert SD card and power up your Raspberry Pi  
 
-# 3.0 Setup Norns
+# 2 Setup Norns
 
 • Follow the guide here: <https://github.com/monome/norns-image/blob/master/build-dev-image.md>  
 Stop once you get to the kernel section.
 
-## 3.1 Build your own kernel (Optional)
+## 2.1 Build your own kernel (Optional)
 
 Follow these two gudies to configure and build a 4.14 kernel:  
 <https://www.raspberrypi.org/documentation/linux/kernel/building.md>  
 <https://www.raspberrypi.org/documentation/linux/kernel/configuring.md>  
 
-### 3.1.1 Configuration
+### 2.1.1 Configuration
 
 • Run `make menuconfig` from the linux folder
 
@@ -28,17 +28,17 @@ You may also want to alter /boot/config.txt e.g. if your using touchscreens
 
 • Once installed, reboot the Raspberry Pi
 
-### 3.1.2 Build
+### 2.1.2 Build
 
 • Complete the the rest of the building guide
 
-## 3.2 Configure Norns image
+## 2.2 Configure Norns image
 
-### 3.2.1 Clone norns-image repo
+### 2.2.1 Clone norns-image repo
 
 • Run `git clone https://github.com/monome/norns-image.git`
 
-### 3.2.2 Remove I2C setup
+### 2.2.2 Remove I2C setup
 
 • Run `nano norns-image/config/norns-init.service`
 
@@ -53,14 +53,14 @@ Press `Ctrl+X` and then `Y` to save changes and exit.
 • Run `nano norns-image/scripts/init-norns.sh`  
 • Comment out the `i2cset` lines by placing a `#` at the start of each line• 
 
-### 3.2.3 Set audio device
+### 2.2.3 Set audio device
 
 • Run `nano norns-image/config/norns-jack.service`  
 • Change `hw:1` to your audio device  
 
 Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-### 3.2.4 Disable network overrides (Optional)
+### 2.2.4 Disable network overrides (Optional)
 
 Complete the following steps to stop Norns overwriting your network settings and configuring the 'norns' access point.  
 
@@ -69,22 +69,22 @@ Complete the following steps to stop Norns overwriting your network settings and
 
 Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-### 3.2.4 Configure Maiden
+### 2.2.5 Configure Maiden
 
 • Run `nano norns-image/config/norns-maiden.service`  
 • Remove `.arm` from the end of `/home/we/maiden/maiden.arm`  
 
 Press `Ctrl+X` and then `Y` to save changes and exit.  
 
-## 3.3 Complete Norns images setup
+## 2.3 Complete Norns images setup
 
 • Run `./norns-image/setup.sh`
 
-# 4 Install Dust
+# 3 Install Dust
 • Run `cd ~`  
 • Run `git clone https://github.com/monome/dust`  
 
-# 5 Install Crone, Maitron and Maiden
+# 4 Install Crone, Maitron and Maiden
 
 • Run `cd ~`  
 • Run `git clone https://github.com/monome/norns`  
@@ -100,18 +100,18 @@ Press `Ctrl+X` and then `Y` to save changes and exit.
 • Run `./install.sh`  
 • Run `popd`  
 
-## 5.1 Install Crone
+## 4.1 Install Crone
 • Run `touch ~/.jackdrc`  
 • Run `cat ~/norns-image/config/jackdrc >> ~/.jackdrc`  
 
-## 5.2 Install Matron
+## 4.2 Install Matron
 • Run `sudo usermod -a -G video we` to ensure that the user can access the framebuffer
 
-## 5.3 Install Maiden
+## 4.3 Install Maiden
 • Download latest .tgz release from <https://github.com/monome/maiden/releases>  
 • Extract it to `~/maiden`  
 
-# 6 Finish
+# 5 Finish
 Reboot and enjoy
 
 # Troubleshooting
